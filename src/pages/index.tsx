@@ -372,11 +372,13 @@ const Index: FC = () => {
                   title={
                     <Space>
                       <Statistic title="Timezone" value={timezone.name} />
-                      <Statistic
-                        title="has DST"
-                        prefix={<BooleanIcon value={spacetime.hasDST()} />}
-                        value=" "
-                      />
+                      {showTZInfo === 'Show' && (
+                        <Statistic
+                          title="has DST"
+                          prefix={<BooleanIcon value={spacetime.hasDST()} />}
+                          value=" "
+                        />
+                      )}
                     </Space>
                   }
                   description={
