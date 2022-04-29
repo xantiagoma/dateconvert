@@ -5,6 +5,8 @@ import dayjs, {Dayjs} from 'dayjs';
 import spacetime, {TimezoneMeta} from 'spacetime';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 import Layout, {Content} from 'antd/lib/layout/layout';
 import Select from 'antd/lib/select';
 import {useCallback} from 'react';
@@ -27,6 +29,7 @@ import Statistic from 'antd/lib/statistic/Statistic';
 import InputNumber from 'antd/lib/input-number';
 import {Col, Row} from 'antd/lib/grid';
 import Card from 'antd/lib/card';
+import Segmented from 'antd/lib/segmented';
 
 spacetime.extend(soft);
 
@@ -36,6 +39,8 @@ const DatePicker = dynamic(() => import('../components/Datepicker'), {
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(advancedFormat);
+dayjs.extend(localizedFormat);
 
 const dstc = (value: any) =>
   stc(value, {
@@ -102,6 +107,10 @@ const Index: FC = () => {
   const [timezones, setTimezones] = useState([]);
   const day = useMemo(() => dayjs.tz(date), [date, tz]);
   const rawDate = useMemo(() => date?.toDate(), [date]);
+  const [format, setFormat] = useState(
+    'dddd MMMM Do YYYY hh:mm:ss.SSS A (z: UTCZ)',
+  );
+  const [showTZInfo, setShowTZInfo] = useState('Show');
 
   useEffect(() => {
     const tz = dayjs.tz.guess();
@@ -218,7 +227,7 @@ const Index: FC = () => {
               <Statistic title="ISO 8601" value={day.toISOString()} />
             </Descriptions.Item>
             <Descriptions.Item>
-              <Statistic title="Format" value={day.format()} />
+              <Statistic title="Default Format" value={day.format()} />
             </Descriptions.Item>
             <Descriptions.Item>
               <Statistic
@@ -240,7 +249,34 @@ const Index: FC = () => {
               <Statistic title="UTC Person" value={day.toString()} />
             </Descriptions.Item>
             <Descriptions.Item>
-              <Statistic title="Local" value={day.toDate().toString()} />
+              <Statistic
+                title="Custom Format"
+                valueStyle={{
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+                prefix={
+                  <Input
+                    placeholder="Format"
+                    style={{width: '100%'}}
+                    value={format}
+                    onChange={(e) => setFormat(e.target.value)}
+                  />
+                }
+                suffix={
+                  <small>
+                    <a
+                      href="https://day.js.org/docs/en/display/format"
+                      rel="noreferrer noopenner"
+                      target="_blank"
+                    >
+                      Format Tokens
+                    </a>
+                  </small>
+                }
+                value={day.format(format)}
+              />
             </Descriptions.Item>
           </Descriptions>
           <Row gutter={[16, 16]}>
@@ -316,6 +352,19 @@ const Index: FC = () => {
           </Row>
 
           <List
+            header={
+              <Statistic
+                title="Show Timezone Info"
+                prefix={
+                  <Segmented
+                    options={['Show', 'Hide']}
+                    value={showTZInfo}
+                    onChange={(v) => setShowTZInfo(v as string)}
+                  />
+                }
+                value=" "
+              />
+            }
             dataSource={spacetimes}
             renderItem={({timezone, day, spacetime, soft}) => (
               <List.Item key={timezone.name}>
@@ -331,61 +380,71 @@ const Index: FC = () => {
                     </Space>
                   }
                   description={
-                    <Space wrap>
+                    <Space wrap align="start">
                       <Card>
                         <Statistic
                           title="Date"
                           value={spacetime.format('iso')}
+                          valueStyle={{fontSize: 16}}
                         />
-                      </Card>
-                      <Card>
                         <Statistic
-                          title="Date is DST"
-                          value=" "
-                          prefix={<BooleanIcon value={spacetime.isDST()} />}
+                          title="Format"
+                          value={day.format(format)}
+                          valueStyle={{fontSize: 16}}
                         />
                       </Card>
-                      <Card>
-                        <Statistic
-                          title="Hemisphere"
-                          value={spacetime.hemisphere()}
-                        />
-                      </Card>
-                      {soft?.some((s) => s.standard?.name) && (
-                        <Card>
-                          <Statistic
-                            title="Standard"
-                            value=" "
-                            prefix={
-                              <>
-                                {soft.map(({standard}) => (
-                                  <TimezoneInfo
-                                    key={standard?.name}
-                                    {...standard}
-                                  />
-                                ))}
-                              </>
-                            }
-                          />
-                        </Card>
-                      )}
-                      {soft?.some((s) => s.daylight?.name) && (
-                        <Card>
-                          <Statistic
-                            title="Daylight"
-                            value=" "
-                            prefix={
-                              <>
-                                {soft.map(({daylight}) => (
-                                  <TimezoneInfo
-                                    key={daylight?.name}
-                                    {...daylight}
-                                  />
-                                ))}
-                              </>
-                            }
-                          />
-                        </Card>
+                      {showTZInfo === 'Show' && (
+                        <>
+                          <Card>
+                            <Statistic
+                              title="Date is DST"
+                              value=" "
+                              prefix={<BooleanIcon value={spacetime.isDST()} />}
+                            />
+                          </Card>
+                          <Card>
+                            <Statistic
+                              title="Hemisphere"
+                              value={spacetime.hemisphere()}
+                            />
+                          </Card>
+                          {soft?.some((s) => s.standard?.name) && (
+                            <Card>
+                              <Statistic
+                                title="Standard"
+                                value=" "
+                                prefix={
+                                  <>
+                                    {soft.map(({standard}) => (
+                                      <TimezoneInfo
+                                        key={standard?.name}
+                                        {...standard}
+                                      />
+                                    ))}
+                                  </>
+                                }
+                              />
+                            </Card>
+                          )}
+                          {soft?.some((s) => s.daylight?.name) && (
+                            <Card>
+                              <Statistic
+                                title="Daylight"
+                                value=" "
+                                prefix={
+                                  <>
+                                    {soft.map(({daylight}) => (
+                                      <TimezoneInfo
+                                        key={daylight?.name}
+                                        {...daylight}
+                                      />
+                                    ))}
+                                  </>
+                                }
+                              />
+                            </Card>
+                          )}
+                        </>
                       )}
                     </Space>
                   }
