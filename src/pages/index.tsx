@@ -8,7 +8,6 @@ import timezone from 'dayjs/plugin/timezone';
 import Layout, {Content} from 'antd/lib/layout/layout';
 import Select from 'antd/lib/select';
 import {useCallback} from 'react';
-import Table from 'antd/lib/table';
 import Tag from 'antd/lib/tag';
 import Input from 'antd/lib/input';
 
@@ -22,8 +21,12 @@ import Modal from 'antd/lib/modal';
 import List from 'antd/lib/list';
 import Tooltip from 'antd/lib/tooltip';
 import Button from 'antd/lib/button';
-import CompressOutlined from '@ant-design/icons/lib/icons/CompressOutlined';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
+import Descriptions from 'antd/lib/descriptions';
+import Statistic from 'antd/lib/statistic/Statistic';
+import InputNumber from 'antd/lib/input-number';
+import {Col, Row} from 'antd/lib/grid';
+import Card from 'antd/lib/card';
 
 spacetime.extend(soft);
 
@@ -104,6 +107,7 @@ const Index: FC = () => {
     const tz = dayjs.tz.guess();
     setDate(dayjs().tz(tz));
     setTz(tz);
+    setTimezones((s) => [...s, tz, 'America/New_York']);
   }, []);
 
   const changeTz = useCallback(
@@ -168,168 +172,226 @@ const Index: FC = () => {
     <Layout>
       <Content style={{minHeight: '100vh'}}>
         <Space direction="vertical" style={{width: '100%', padding: '1rem'}}>
-          <Space
-            wrap
-            style={{
-              width: '100%',
-              display: 'grid',
-              gridTemplateColumns: '1fr auto',
-            }}
-          >
-            <Select
-              showSearch
-              value={tz}
-              onChange={changeTz}
-              options={options}
-              placeholder="Timezone"
-              size="large"
-              tagRender={tagRender}
-              style={{flexGrow: 1, width: '100%'}}
-            />
-            <DatePicker
-              key={tz}
-              value={day}
-              onChange={(date) => setDate(dayjs.tz(date))}
-              size="large"
-              showTime
-              allowClear={false}
-            />
-          </Space>
-          <Space
-            direction="vertical"
-            wrap
-            style={{
-              width: '100%',
-              display: 'grid',
-              gridTemplateColumns: '1fr',
-            }}
-          >
-            {date.toISOString()}
-            {date.format()}
-            {date.toDate().toString()}
-          </Space>
-          <Space
-            wrap
-            align="start"
-            style={{
-              width: '100%',
-              display: 'grid',
-              gridTemplateColumns: '1fr auto',
-            }}
-          >
-            <Select
-              size="large"
-              mode="multiple"
-              style={{width: '100%'}}
-              placeholder="Timezone"
-              options={options}
-              value={timezones}
-              onChange={setTimezones}
-              tagRender={tagRender}
-            />
-            <Input.Search
-              size="large"
-              placeholder="Search Custom Timezone"
-              onSearch={(value) => {
-                const results = soft(value);
-                if (!results.length) {
-                  message.error('Not timezone found');
-                } else {
-                  Modal.info({
-                    title: 'Timezones found',
-                    okText: 'Close',
-                    cancelButtonProps: {disabled: true},
-                    content: (
-                      <List
-                        dataSource={results}
-                        renderItem={({iana, standard, daylight}) => (
-                          <List.Item
-                            actions={[
-                              <Tooltip title={`Select - ${iana}`} key="search">
-                                <Button
-                                  type="dashed"
-                                  shape="circle"
-                                  icon={<PlusOutlined />}
-                                  size="large"
-                                  onClick={() => {
-                                    //changeTz(iana);
-                                    setTimezones((value) => [...value, iana]);
-                                    Modal.destroyAll();
-                                  }}
-                                />
-                              </Tooltip>,
-                            ]}
-                          >
-                            <List.Item.Meta
-                              title={iana}
-                              description={
-                                <Space direction="vertical">
-                                  {standard && <TimezoneInfo {...standard} />}
-                                  {daylight?.name && (
-                                    <TimezoneInfo {...daylight} />
-                                  )}
-                                </Space>
-                              }
-                            />
-                          </List.Item>
-                        )}
-                      />
-                    ),
-                  });
+          <Row gutter={[16, 16]}>
+            <Col xs={24} lg={16}>
+              <Select
+                showSearch
+                value={tz}
+                onChange={changeTz}
+                options={options}
+                placeholder="Timezone"
+                size="large"
+                tagRender={tagRender}
+                style={{width: '100%'}}
+              />
+            </Col>
+            <Col xs={24} lg={8}>
+              <DatePicker
+                key={tz}
+                value={day}
+                onChange={(date) => setDate(dayjs.tz(date))}
+                size="large"
+                showTime
+                allowClear={false}
+                style={{width: '100%'}}
+              />
+            </Col>
+          </Row>
+          <Descriptions title="User Info">
+            <Descriptions.Item>
+              <Statistic
+                title="Unix (seconds)"
+                prefix={
+                  <InputNumber
+                    value={day.unix()}
+                    size="large"
+                    style={{width: '100%'}}
+                    onChange={(unixS) => setDate(dayjs.tz(unixS * 1000))}
+                  />
                 }
-              }}
-            />
-          </Space>
-          <Table
-            columns={[
-              {
-                title: 'Timezone',
-                render: (text, {timezone}, index) => timezone.name,
-              },
-              {
-                title: 'Timezone has DST',
-                render: (text, {spacetime}, index) => (
-                  <BooleanIcon value={spacetime.hasDST()} />
-                ),
-              },
-              {
-                title: 'Date',
-                render: (text, {day, dayWithTz, spacetime}, index) =>
-                  spacetime.format('iso'),
-              },
-              {
-                title: 'Date is DST',
-                render: (text, {spacetime}, index) => (
-                  <BooleanIcon value={spacetime.isDST()} />
-                ),
-              },
+                value=" "
+                decimalSeparator=""
+                groupSeparator=""
+              />
+            </Descriptions.Item>
+            <Descriptions.Item>
+              <Statistic title="ISO 8601" value={day.toISOString()} />
+            </Descriptions.Item>
+            <Descriptions.Item>
+              <Statistic title="Format" value={day.format()} />
+            </Descriptions.Item>
+            <Descriptions.Item>
+              <Statistic
+                title="Unix Timestamp (milliseconds)"
+                prefix={
+                  <InputNumber
+                    value={day.valueOf()}
+                    size="large"
+                    style={{width: '100%'}}
+                    onChange={(unix) => setDate(dayjs.tz(unix))}
+                  />
+                }
+                value=" "
+                decimalSeparator=""
+                groupSeparator=""
+              />
+            </Descriptions.Item>
+            <Descriptions.Item>
+              <Statistic title="UTC Person" value={day.toString()} />
+            </Descriptions.Item>
+            <Descriptions.Item>
+              <Statistic title="Local" value={day.toDate().toString()} />
+            </Descriptions.Item>
+          </Descriptions>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} lg={16}>
+              <Select
+                size="large"
+                mode="multiple"
+                style={{width: '100%'}}
+                placeholder="Timezones"
+                options={options}
+                value={timezones}
+                onChange={setTimezones}
+                tagRender={tagRender}
+              />
+            </Col>
+            <Col xs={24} lg={8}>
+              <Input.Search
+                size="large"
+                placeholder="Search Custom Timezone"
+                onSearch={(value) => {
+                  const results = soft(value);
+                  if (!results.length) {
+                    message.error('Not timezone found');
+                  } else {
+                    Modal.info({
+                      title: 'Timezones found',
+                      okText: 'Close',
+                      cancelButtonProps: {disabled: true},
+                      content: (
+                        <List
+                          dataSource={results}
+                          renderItem={({iana, standard, daylight}) => (
+                            <List.Item
+                              actions={[
+                                <Tooltip
+                                  title={`Select - ${iana}`}
+                                  key="search"
+                                >
+                                  <Button
+                                    type="dashed"
+                                    shape="circle"
+                                    icon={<PlusOutlined />}
+                                    size="large"
+                                    onClick={() => {
+                                      //changeTz(iana);
+                                      setTimezones((value) => [...value, iana]);
+                                      Modal.destroyAll();
+                                    }}
+                                  />
+                                </Tooltip>,
+                              ]}
+                            >
+                              <List.Item.Meta
+                                title={iana}
+                                description={
+                                  <Space direction="vertical">
+                                    {standard && <TimezoneInfo {...standard} />}
+                                    {daylight?.name && (
+                                      <TimezoneInfo {...daylight} />
+                                    )}
+                                  </Space>
+                                }
+                              />
+                            </List.Item>
+                          )}
+                        />
+                      ),
+                    });
+                  }
+                }}
+              />
+            </Col>
+          </Row>
 
-              {
-                title: 'Hemisphere',
-                render: (text, {spacetime}, index) => spacetime.hemisphere(),
-              },
-              {
-                title: 'Standard',
-                render: (text, {soft}, index) => (
-                  <>
-                    {soft.map(({standard}) => (
-                      <TimezoneInfo key={standard?.name} {...standard} />
-                    ))}
-                  </>
-                ),
-              },
-              {
-                title: 'Daylight',
-                render: (text, {soft}, index) => (
-                  <>
-                    {soft.map(({daylight}) => (
-                      <TimezoneInfo key={daylight?.name} {...daylight} />
-                    ))}
-                  </>
-                ),
-              },
-            ]}
+          <List
             dataSource={spacetimes}
+            renderItem={({timezone, day, spacetime, soft}) => (
+              <List.Item key={timezone.name}>
+                <List.Item.Meta
+                  title={
+                    <Space>
+                      <Statistic title="Timezone" value={timezone.name} />
+                      <Statistic
+                        title="has DST"
+                        prefix={<BooleanIcon value={spacetime.hasDST()} />}
+                        value=" "
+                      />
+                    </Space>
+                  }
+                  description={
+                    <Space wrap>
+                      <Card>
+                        <Statistic
+                          title="Date"
+                          value={spacetime.format('iso')}
+                        />
+                      </Card>
+                      <Card>
+                        <Statistic
+                          title="Date is DST"
+                          value=" "
+                          prefix={<BooleanIcon value={spacetime.isDST()} />}
+                        />
+                      </Card>
+                      <Card>
+                        <Statistic
+                          title="Hemisphere"
+                          value={spacetime.hemisphere()}
+                        />
+                      </Card>
+                      {soft?.some((s) => s.standard?.name) && (
+                        <Card>
+                          <Statistic
+                            title="Standard"
+                            value=" "
+                            prefix={
+                              <>
+                                {soft.map(({standard}) => (
+                                  <TimezoneInfo
+                                    key={standard?.name}
+                                    {...standard}
+                                  />
+                                ))}
+                              </>
+                            }
+                          />
+                        </Card>
+                      )}
+                      {soft?.some((s) => s.daylight?.name) && (
+                        <Card>
+                          <Statistic
+                            title="Daylight"
+                            value=" "
+                            prefix={
+                              <>
+                                {soft.map(({daylight}) => (
+                                  <TimezoneInfo
+                                    key={daylight?.name}
+                                    {...daylight}
+                                  />
+                                ))}
+                              </>
+                            }
+                          />
+                        </Card>
+                      )}
+                    </Space>
+                  }
+                />
+              </List.Item>
+            )}
           />
         </Space>
       </Content>
