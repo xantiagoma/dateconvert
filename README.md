@@ -1,11 +1,10 @@
-# Nextjs + Base Web + TypeScript
+# Date Convert
 
-This is an opinionated scaffold of Next.js and Base Web. It comes with:
+Online utility to parse a date between different timezones.
 
-- Nextjs
-- Base Web
-- Styletron
-- Jest
-- Eslint
-- Prettier
-- TypeScript
+## [dateconvert.vercel.app](https://dateconvert.vercel.app/)
+
+![Screenshot](https://user-images.githubusercontent.com/1217807/165879377-c12dfae7-09cc-40de-b192-3c4bf2fc7f22.png)
+
+
+Made with Day.js, Spacetime, React, Next.js & Ant.design - hosted on Vercel
