@@ -1,0 +1,126 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+@custom-variant data-horizontal (&[data-orientation="horizontal"]);
+@custom-variant data-vertical (&[data-orientation="vertical"]);
+
+/*
+ * DateConvert tokens: warm ivory / warm charcoal with an orange accent.
+ * Values start from the redesign pack (design/tokens.css); contrast was
+ * re-checked for small text: --brand-text and --primary meet 4.5:1 on their
+ * backgrounds in both themes.
+ */
+:root {
+  color-scheme: light;
+  --background: #faf8f4;
+  --foreground: #1b1916;
+  --card: #fffdf9;
+  --card-foreground: #1b1916;
+  --popover: #fffdf9;
+  --popover-foreground: #1b1916;
+  --primary: #be350f;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f2ed;
+  --secondary-foreground: #1b1916;
+  --muted: #f0ece5;
+  --muted-foreground: #625d55;
+  --accent: #fff0e8;
+  --accent-foreground: #1b1916;
+  --destructive: #b42318;
+  --border: #d9d3ca;
+  --input: #d9d3ca;
+  --ring: #ff4d16;
+  --field: #f7f4ef;
+  --brand: #ff4d16;
+  --brand-text: #b8320c;
+  --brand-soft: #fff0e8;
+  --success: #24633b;
+  --radius: 0.5rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #171614;
+  --foreground: #f5f0e7;
+  --card: #1e1c19;
+  --card-foreground: #f5f0e7;
+  --popover: #24211d;
+  --popover-foreground: #f5f0e7;
+  --primary: #ff784a;
+  --primary-foreground: #21150f;
+  --secondary: #25221e;
+  --secondary-foreground: #f5f0e7;
+  --muted: #2a2722;
+  --muted-foreground: #bbb3a7;
+  --accent: #35251d;
+  --accent-foreground: #f5f0e7;
+  --destructive: #ffa59d;
+  --border: #3d3830;
+  --input: #514a40;
+  --ring: #ff6a38;
+  --field: #211f1b;
+  --brand: #ff6a38;
+  --brand-text: #ff926c;
+  --brand-soft: #35251d;
+  --success: #a0d7af;
+}
+
+@theme inline {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: "Source Serif 4 Variable", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-field: var(--field);
+  --color-brand: var(--brand);
+  --color-brand-text: var(--brand-text);
+  --color-brand-soft: var(--brand-soft);
+  --color-success: var(--success);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply bg-background;
+  }
+  body {
+    @apply min-w-[320px] bg-background font-sans text-foreground antialiased;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "zero" 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
