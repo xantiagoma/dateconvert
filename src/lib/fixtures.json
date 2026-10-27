@@ -1,0 +1,13 @@
+{
+  "description": "Verified reference data; not a report of application tests.",
+  "isoUTC": "2026-10-26T14:30:00.000Z",
+  "epochSeconds": 1793025000,
+  "epochMilliseconds": 1793025000000,
+  "zones": {
+    "America/Bogota": "2026-10-26T09:30:00-05:00",
+    "America/New_York": "2026-10-26T10:30:00-04:00",
+    "Europe/London": "2026-10-26T14:30:00+00:00",
+    "Asia/Tokyo": "2026-10-26T23:30:00+09:00",
+    "Asia/Kathmandu": "2026-10-26T20:15:00+05:45"
+  }
+}
